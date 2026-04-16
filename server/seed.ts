@@ -1,5 +1,5 @@
-import { storage, db } from "./storage";
-import { inquiries } from "@shared/schema";
+import { storage } from "./storage";
+import type { MemoryStorage } from "./storage";
 
 export function seedDatabase() {
   if (storage.hospitalCount() > 0) return;
@@ -160,213 +160,26 @@ export function seedDatabase() {
   });
 
   // === TREATMENTS ===
-  // Cardiac
-  storage.createTreatment({
-    name: "Coronary Artery Bypass Grafting (CABG)",
-    category: "Cardiac",
-    description: "Open-heart surgery to improve blood flow to the heart by creating a bypass around blocked coronary arteries.",
-    avgCostIndia: 5500,
-    avgCostUS: 123000,
-    avgCostUK: 28000,
-    avgCostCanada: 35000,
-    duration: "5-7 days hospital, 6-8 weeks recovery",
-    hospitalIds: JSON.stringify([1, 2, 4, 7, 10]),
-  });
-  storage.createTreatment({
-    name: "Heart Valve Replacement",
-    category: "Cardiac",
-    description: "Surgical replacement of damaged heart valves with mechanical or biological prosthetic valves.",
-    avgCostIndia: 7000,
-    avgCostUS: 170000,
-    avgCostUK: 35000,
-    avgCostCanada: 42000,
-    duration: "7-10 days hospital, 8-12 weeks recovery",
-    hospitalIds: JSON.stringify([1, 4, 7, 10]),
-  });
-  storage.createTreatment({
-    name: "Angioplasty with Stent",
-    category: "Cardiac",
-    description: "Minimally invasive procedure to open blocked arteries and place stents to improve blood flow.",
-    avgCostIndia: 3500,
-    avgCostUS: 57000,
-    avgCostUK: 16000,
-    avgCostCanada: 20000,
-    duration: "1-2 days hospital, 1-2 weeks recovery",
-    hospitalIds: JSON.stringify([1, 2, 4, 6, 7, 10]),
-  });
+  storage.createTreatment({ name: "Coronary Artery Bypass Grafting (CABG)", category: "Cardiac", description: "Open-heart surgery to improve blood flow to the heart by creating a bypass around blocked coronary arteries.", avgCostIndia: 5500, avgCostUS: 123000, avgCostUK: 28000, avgCostCanada: 35000, duration: "5-7 days hospital, 6-8 weeks recovery", hospitalIds: JSON.stringify([1, 2, 4, 7, 10]) });
+  storage.createTreatment({ name: "Heart Valve Replacement", category: "Cardiac", description: "Surgical replacement of damaged heart valves with mechanical or biological prosthetic valves.", avgCostIndia: 7000, avgCostUS: 170000, avgCostUK: 35000, avgCostCanada: 42000, duration: "7-10 days hospital, 8-12 weeks recovery", hospitalIds: JSON.stringify([1, 4, 7, 10]) });
+  storage.createTreatment({ name: "Angioplasty with Stent", category: "Cardiac", description: "Minimally invasive procedure to open blocked arteries and place stents to improve blood flow.", avgCostIndia: 3500, avgCostUS: 57000, avgCostUK: 16000, avgCostCanada: 20000, duration: "1-2 days hospital, 1-2 weeks recovery", hospitalIds: JSON.stringify([1, 2, 4, 6, 7, 10]) });
+  storage.createTreatment({ name: "Total Knee Replacement", category: "Orthopedic", description: "Surgical replacement of the knee joint with an artificial prosthesis to relieve pain and restore mobility.", avgCostIndia: 4500, avgCostUS: 50000, avgCostUK: 15000, avgCostCanada: 18000, duration: "4-5 days hospital, 6-8 weeks recovery", hospitalIds: JSON.stringify([3, 5, 7, 9, 12]) });
+  storage.createTreatment({ name: "Total Hip Replacement", category: "Orthopedic", description: "Replacement of the hip joint with a prosthetic implant to treat severe arthritis or hip fractures.", avgCostIndia: 5000, avgCostUS: 52000, avgCostUK: 16000, avgCostCanada: 19000, duration: "4-6 days hospital, 8-10 weeks recovery", hospitalIds: JSON.stringify([3, 7, 9, 12]) });
+  storage.createTreatment({ name: "Spinal Fusion Surgery", category: "Orthopedic", description: "Surgical procedure to fuse two or more vertebrae to stabilize the spine and reduce pain.", avgCostIndia: 6000, avgCostUS: 110000, avgCostUK: 25000, avgCostCanada: 30000, duration: "5-7 days hospital, 3-6 months recovery", hospitalIds: JSON.stringify([3, 9]) });
+  storage.createTreatment({ name: "Chemotherapy (per cycle)", category: "Oncology", description: "Drug treatment using anti-cancer medications to destroy cancer cells. Cost per cycle varies by drug regimen.", avgCostIndia: 800, avgCostUS: 12000, avgCostUK: 4000, avgCostCanada: 5000, duration: "1-3 days per cycle, 4-6 cycles typical", hospitalIds: JSON.stringify([1, 4, 6, 7, 8, 10, 11]) });
+  storage.createTreatment({ name: "Robotic Cancer Surgery", category: "Oncology", description: "Minimally invasive cancer removal using robotic surgical systems for greater precision and faster recovery.", avgCostIndia: 5500, avgCostUS: 85000, avgCostUK: 22000, avgCostCanada: 28000, duration: "3-5 days hospital, 3-4 weeks recovery", hospitalIds: JSON.stringify([1, 6, 7, 8]) });
+  storage.createTreatment({ name: "IVF Treatment (single cycle)", category: "Fertility", description: "In vitro fertilization including ovarian stimulation, egg retrieval, fertilization, and embryo transfer.", avgCostIndia: 3000, avgCostUS: 23000, avgCostUK: 8000, avgCostCanada: 10000, duration: "2-3 weeks active treatment", hospitalIds: JSON.stringify([5, 7, 11]) });
+  storage.createTreatment({ name: "IUI Treatment", category: "Fertility", description: "Intrauterine insemination — a less invasive fertility procedure where sperm is placed directly in the uterus.", avgCostIndia: 500, avgCostUS: 4000, avgCostUK: 1500, avgCostCanada: 2000, duration: "1-2 days procedure", hospitalIds: JSON.stringify([5, 7, 11]) });
+  storage.createTreatment({ name: "Dental Implants (per tooth)", category: "Dental", description: "Titanium implant surgically placed in the jawbone to replace missing teeth with natural-looking prosthetics.", avgCostIndia: 600, avgCostUS: 5000, avgCostUK: 2500, avgCostCanada: 3500, duration: "2-3 visits over 3-6 months", hospitalIds: JSON.stringify([6, 9, 12]) });
+  storage.createTreatment({ name: "Full Mouth Dental Rehabilitation", category: "Dental", description: "Complete reconstruction of the entire mouth including crowns, bridges, implants, and cosmetic dentistry.", avgCostIndia: 3500, avgCostUS: 40000, avgCostUK: 18000, avgCostCanada: 22000, duration: "1-2 weeks, multiple sessions", hospitalIds: JSON.stringify([6, 9, 12]) });
+  storage.createTreatment({ name: "LASIK Eye Surgery", category: "Ophthalmology", description: "Laser-assisted vision correction surgery to treat nearsightedness, farsightedness, and astigmatism.", avgCostIndia: 1000, avgCostUS: 5500, avgCostUK: 3000, avgCostCanada: 3500, duration: "Outpatient, 1-2 days recovery", hospitalIds: JSON.stringify([5, 8, 12]) });
+  storage.createTreatment({ name: "Cataract Surgery", category: "Ophthalmology", description: "Removal of the clouded natural lens and replacement with an artificial intraocular lens.", avgCostIndia: 800, avgCostUS: 6000, avgCostUK: 3500, avgCostCanada: 4000, duration: "Outpatient, 1-2 weeks full recovery", hospitalIds: JSON.stringify([5, 8, 12]) });
+  storage.createTreatment({ name: "Rhinoplasty", category: "Cosmetic", description: "Surgical reshaping of the nose for cosmetic or functional improvement.", avgCostIndia: 2000, avgCostUS: 12000, avgCostUK: 6000, avgCostCanada: 8000, duration: "1-2 days hospital, 2-3 weeks recovery", hospitalIds: JSON.stringify([5, 9, 12]) });
+  storage.createTreatment({ name: "Liposuction", category: "Cosmetic", description: "Surgical removal of excess fat deposits from specific areas of the body for improved contour.", avgCostIndia: 1500, avgCostUS: 8000, avgCostUK: 5000, avgCostCanada: 6500, duration: "1 day hospital, 2-4 weeks recovery", hospitalIds: JSON.stringify([5, 9, 12]) });
+  storage.createTreatment({ name: "Hair Transplant (FUE)", category: "Cosmetic", description: "Follicular Unit Extraction hair transplant for natural-looking hair restoration.", avgCostIndia: 1500, avgCostUS: 15000, avgCostUK: 8000, avgCostCanada: 10000, duration: "1 day procedure, 1-2 weeks initial recovery", hospitalIds: JSON.stringify([5, 9, 12]) });
 
-  // Orthopedic
-  storage.createTreatment({
-    name: "Total Knee Replacement",
-    category: "Orthopedic",
-    description: "Surgical replacement of the knee joint with an artificial prosthesis to relieve pain and restore mobility.",
-    avgCostIndia: 4500,
-    avgCostUS: 50000,
-    avgCostUK: 15000,
-    avgCostCanada: 18000,
-    duration: "4-5 days hospital, 6-8 weeks recovery",
-    hospitalIds: JSON.stringify([3, 5, 7, 9, 12]),
-  });
-  storage.createTreatment({
-    name: "Total Hip Replacement",
-    category: "Orthopedic",
-    description: "Replacement of the hip joint with a prosthetic implant to treat severe arthritis or hip fractures.",
-    avgCostIndia: 5000,
-    avgCostUS: 52000,
-    avgCostUK: 16000,
-    avgCostCanada: 19000,
-    duration: "4-6 days hospital, 8-10 weeks recovery",
-    hospitalIds: JSON.stringify([3, 7, 9, 12]),
-  });
-  storage.createTreatment({
-    name: "Spinal Fusion Surgery",
-    category: "Orthopedic",
-    description: "Surgical procedure to fuse two or more vertebrae to stabilize the spine and reduce pain.",
-    avgCostIndia: 6000,
-    avgCostUS: 110000,
-    avgCostUK: 25000,
-    avgCostCanada: 30000,
-    duration: "5-7 days hospital, 3-6 months recovery",
-    hospitalIds: JSON.stringify([3, 9]),
-  });
-
-  // Oncology
-  storage.createTreatment({
-    name: "Chemotherapy (per cycle)",
-    category: "Oncology",
-    description: "Drug treatment using anti-cancer medications to destroy cancer cells. Cost per cycle varies by drug regimen.",
-    avgCostIndia: 800,
-    avgCostUS: 12000,
-    avgCostUK: 4000,
-    avgCostCanada: 5000,
-    duration: "1-3 days per cycle, 4-6 cycles typical",
-    hospitalIds: JSON.stringify([1, 4, 6, 7, 8, 10, 11]),
-  });
-  storage.createTreatment({
-    name: "Robotic Cancer Surgery",
-    category: "Oncology",
-    description: "Minimally invasive cancer removal using robotic surgical systems for greater precision and faster recovery.",
-    avgCostIndia: 5500,
-    avgCostUS: 85000,
-    avgCostUK: 22000,
-    avgCostCanada: 28000,
-    duration: "3-5 days hospital, 3-4 weeks recovery",
-    hospitalIds: JSON.stringify([1, 6, 7, 8]),
-  });
-
-  // Fertility
-  storage.createTreatment({
-    name: "IVF Treatment (single cycle)",
-    category: "Fertility",
-    description: "In vitro fertilization including ovarian stimulation, egg retrieval, fertilization, and embryo transfer.",
-    avgCostIndia: 3000,
-    avgCostUS: 23000,
-    avgCostUK: 8000,
-    avgCostCanada: 10000,
-    duration: "2-3 weeks active treatment",
-    hospitalIds: JSON.stringify([5, 7, 11]),
-  });
-  storage.createTreatment({
-    name: "IUI Treatment",
-    category: "Fertility",
-    description: "Intrauterine insemination — a less invasive fertility procedure where sperm is placed directly in the uterus.",
-    avgCostIndia: 500,
-    avgCostUS: 4000,
-    avgCostUK: 1500,
-    avgCostCanada: 2000,
-    duration: "1-2 days procedure",
-    hospitalIds: JSON.stringify([5, 7, 11]),
-  });
-
-  // Dental
-  storage.createTreatment({
-    name: "Dental Implants (per tooth)",
-    category: "Dental",
-    description: "Titanium implant surgically placed in the jawbone to replace missing teeth with natural-looking prosthetics.",
-    avgCostIndia: 600,
-    avgCostUS: 5000,
-    avgCostUK: 2500,
-    avgCostCanada: 3500,
-    duration: "2-3 visits over 3-6 months",
-    hospitalIds: JSON.stringify([6, 9, 12]),
-  });
-  storage.createTreatment({
-    name: "Full Mouth Dental Rehabilitation",
-    category: "Dental",
-    description: "Complete reconstruction of the entire mouth including crowns, bridges, implants, and cosmetic dentistry.",
-    avgCostIndia: 3500,
-    avgCostUS: 40000,
-    avgCostUK: 18000,
-    avgCostCanada: 22000,
-    duration: "1-2 weeks, multiple sessions",
-    hospitalIds: JSON.stringify([6, 9, 12]),
-  });
-
-  // Ophthalmology
-  storage.createTreatment({
-    name: "LASIK Eye Surgery",
-    category: "Ophthalmology",
-    description: "Laser-assisted vision correction surgery to treat nearsightedness, farsightedness, and astigmatism.",
-    avgCostIndia: 1000,
-    avgCostUS: 5500,
-    avgCostUK: 3000,
-    avgCostCanada: 3500,
-    duration: "Outpatient, 1-2 days recovery",
-    hospitalIds: JSON.stringify([5, 8, 12]),
-  });
-  storage.createTreatment({
-    name: "Cataract Surgery",
-    category: "Ophthalmology",
-    description: "Removal of the clouded natural lens and replacement with an artificial intraocular lens.",
-    avgCostIndia: 800,
-    avgCostUS: 6000,
-    avgCostUK: 3500,
-    avgCostCanada: 4000,
-    duration: "Outpatient, 1-2 weeks full recovery",
-    hospitalIds: JSON.stringify([5, 8, 12]),
-  });
-
-  // Cosmetic
-  storage.createTreatment({
-    name: "Rhinoplasty",
-    category: "Cosmetic",
-    description: "Surgical reshaping of the nose for cosmetic or functional improvement.",
-    avgCostIndia: 2000,
-    avgCostUS: 12000,
-    avgCostUK: 6000,
-    avgCostCanada: 8000,
-    duration: "1-2 days hospital, 2-3 weeks recovery",
-    hospitalIds: JSON.stringify([5, 9, 12]),
-  });
-  storage.createTreatment({
-    name: "Liposuction",
-    category: "Cosmetic",
-    description: "Surgical removal of excess fat deposits from specific areas of the body for improved contour.",
-    avgCostIndia: 1500,
-    avgCostUS: 8000,
-    avgCostUK: 5000,
-    avgCostCanada: 6500,
-    duration: "1 day hospital, 2-4 weeks recovery",
-    hospitalIds: JSON.stringify([5, 9, 12]),
-  });
-  storage.createTreatment({
-    name: "Hair Transplant (FUE)",
-    category: "Cosmetic",
-    description: "Follicular Unit Extraction hair transplant for natural-looking hair restoration.",
-    avgCostIndia: 1500,
-    avgCostUS: 15000,
-    avgCostUK: 8000,
-    avgCostCanada: 10000,
-    duration: "1 day procedure, 1-2 weeks initial recovery",
-    hospitalIds: JSON.stringify([5, 9, 12]),
-  });
-
-  // Seed some inquiries for admin dashboard
+  // Seed sample inquiries for admin dashboard
   const statuses = ["New", "Contacted", "Qualified", "Converted", "Lost"];
-  const countries = ["UAE", "Oman", "Kuwait", "Saudi Arabia", "Qatar", "Bahrain", "Nigeria", "Kenya"];
-  const cities = ["Chennai", "Kochi", "Bangalore", "Hyderabad"];
-  const treatmentTypes = ["Cardiac", "Orthopedic", "Oncology", "Fertility", "Dental", "Ophthalmology", "Cosmetic"];
-
   const sampleInquiries = [
     { fullName: "Ahmed Al-Rashid", email: "ahmed@example.com", phone: "+971501234567", country: "UAE", treatmentInterest: "Cardiac", message: "Need consultation for heart valve surgery", preferredCity: "Chennai" },
     { fullName: "Fatima Al-Sayed", email: "fatima@example.com", phone: "+96812345678", country: "Oman", treatmentInterest: "Orthopedic", message: "Looking for knee replacement options", preferredCity: "Bangalore" },
@@ -382,13 +195,12 @@ export function seedDatabase() {
     const daysAgo = Math.floor(Math.random() * 30);
     const date = new Date();
     date.setDate(date.getDate() - daysAgo);
-    // Manually insert with varied statuses
     const status = statuses[i % statuses.length];
-    db.insert(inquiries).values({
+    (storage as MemoryStorage).insertInquiryDirect({
       ...inq,
       status,
       createdAt: date.toISOString(),
-    }).run();
+    });
   });
 
   console.log("Database seeded successfully!");

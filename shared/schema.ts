@@ -1,69 +1,102 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const hospitals = sqliteTable("hospitals", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
-  city: text("city").notNull(),
-  address: text("address").notNull(),
-  specializations: text("specializations").notNull(), // JSON array
-  rating: real("rating").notNull(),
-  accreditations: text("accreditations").notNull(), // JSON array
-  description: text("description").notNull(),
-  imageUrl: text("image_url"),
-  bedCount: integer("bed_count").notNull(),
-  established: integer("established").notNull(),
+// === Types ===
+export interface Hospital {
+  id: number;
+  name: string;
+  city: string;
+  address: string;
+  specializations: string; // JSON array
+  rating: number;
+  accreditations: string; // JSON array
+  description: string;
+  imageUrl: string | null;
+  bedCount: number;
+  established: number;
+}
+
+export interface Treatment {
+  id: number;
+  name: string;
+  category: string;
+  description: string;
+  avgCostIndia: number;
+  avgCostUS: number;
+  avgCostUK: number;
+  avgCostCanada: number;
+  duration: string;
+  hospitalIds: string; // JSON array of IDs
+}
+
+export interface Inquiry {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  country: string;
+  treatmentInterest: string;
+  message: string | null;
+  status: string;
+  preferredCity: string | null;
+  createdAt: string;
+}
+
+export interface CostEstimate {
+  id: number;
+  inquiryId: number | null;
+  treatmentId: number;
+  estimatedCost: number;
+  hospitalId: number | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+// === Insert schemas (for validation) ===
+export const insertHospitalSchema = z.object({
+  name: z.string(),
+  city: z.string(),
+  address: z.string(),
+  specializations: z.string(),
+  rating: z.number(),
+  accreditations: z.string(),
+  description: z.string(),
+  imageUrl: z.string().nullable().optional(),
+  bedCount: z.number(),
+  established: z.number(),
 });
 
-export const treatments = sqliteTable("treatments", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
-  category: text("category").notNull(),
-  description: text("description").notNull(),
-  avgCostIndia: integer("avg_cost_india").notNull(),
-  avgCostUS: integer("avg_cost_us").notNull(),
-  avgCostUK: integer("avg_cost_uk").notNull(),
-  avgCostCanada: integer("avg_cost_canada").notNull(),
-  duration: text("duration").notNull(),
-  hospitalIds: text("hospital_ids").notNull(), // JSON array of IDs
+export const insertTreatmentSchema = z.object({
+  name: z.string(),
+  category: z.string(),
+  description: z.string(),
+  avgCostIndia: z.number(),
+  avgCostUS: z.number(),
+  avgCostUK: z.number(),
+  avgCostCanada: z.number(),
+  duration: z.string(),
+  hospitalIds: z.string(),
 });
 
-export const inquiries = sqliteTable("inquiries", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  fullName: text("full_name").notNull(),
-  email: text("email").notNull(),
-  phone: text("phone").notNull(),
-  country: text("country").notNull(),
-  treatmentInterest: text("treatment_interest").notNull(),
-  message: text("message"),
-  status: text("status").notNull().default("New"),
-  preferredCity: text("preferred_city"),
-  createdAt: text("created_at").notNull(),
+export const insertInquirySchema = z.object({
+  fullName: z.string(),
+  email: z.string().email(),
+  phone: z.string(),
+  country: z.string(),
+  treatmentInterest: z.string(),
+  message: z.string().nullable().optional(),
+  preferredCity: z.string().nullable().optional(),
 });
 
-export const costEstimates = sqliteTable("cost_estimates", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  inquiryId: integer("inquiry_id"),
-  treatmentId: integer("treatment_id").notNull(),
-  estimatedCost: integer("estimated_cost").notNull(),
-  hospitalId: integer("hospital_id"),
-  notes: text("notes"),
-  createdAt: text("created_at").notNull(),
+export const insertCostEstimateSchema = z.object({
+  inquiryId: z.number().nullable().optional(),
+  treatmentId: z.number(),
+  estimatedCost: z.number(),
+  hospitalId: z.number().nullable().optional(),
+  notes: z.string().nullable().optional(),
 });
 
-// Insert schemas
-export const insertHospitalSchema = createInsertSchema(hospitals).omit({ id: true });
-export const insertTreatmentSchema = createInsertSchema(treatments).omit({ id: true });
-export const insertInquirySchema = createInsertSchema(inquiries).omit({ id: true, status: true, createdAt: true });
-export const insertCostEstimateSchema = createInsertSchema(costEstimates).omit({ id: true, createdAt: true });
-
-// Types
-export type Hospital = typeof hospitals.$inferSelect;
+// === Insert types ===
 export type InsertHospital = z.infer<typeof insertHospitalSchema>;
-export type Treatment = typeof treatments.$inferSelect;
 export type InsertTreatment = z.infer<typeof insertTreatmentSchema>;
-export type Inquiry = typeof inquiries.$inferSelect;
 export type InsertInquiry = z.infer<typeof insertInquirySchema>;
-export type CostEstimate = typeof costEstimates.$inferSelect;
 export type InsertCostEstimate = z.infer<typeof insertCostEstimateSchema>;

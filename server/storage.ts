@@ -1,17 +1,9 @@
 import {
-  type Hospital, type InsertHospital, hospitals,
-  type Treatment, type InsertTreatment, treatments,
-  type Inquiry, type InsertInquiry, inquiries,
-  type CostEstimate, type InsertCostEstimate, costEstimates,
+  type Hospital, type InsertHospital,
+  type Treatment, type InsertTreatment,
+  type Inquiry, type InsertInquiry,
+  type CostEstimate, type InsertCostEstimate,
 } from "@shared/schema";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
-import { eq, like, and, sql } from "drizzle-orm";
-
-const sqlite = new Database("data.db");
-sqlite.pragma("journal_mode = WAL");
-
-export const db = drizzle(sqlite);
 
 export interface IStorage {
   // Hospitals
@@ -44,95 +36,112 @@ export interface IStorage {
   hospitalCount(): number;
 }
 
-export class DatabaseStorage implements IStorage {
+export class MemoryStorage implements IStorage {
+  private hospitals: Hospital[] = [];
+  private treatments: Treatment[] = [];
+  private inquiries: Inquiry[] = [];
+  private costEstimates: CostEstimate[] = [];
+  private nextHospitalId = 1;
+  private nextTreatmentId = 1;
+  private nextInquiryId = 1;
+  private nextCostEstimateId = 1;
+
   getHospitals(city?: string, specialization?: string): Hospital[] {
-    let result = db.select().from(hospitals);
-    const conditions = [];
-    if (city) conditions.push(eq(hospitals.city, city));
-    if (specialization) conditions.push(like(hospitals.specializations, `%${specialization}%`));
-    if (conditions.length > 0) {
-      return (result as any).where(and(...conditions)).all();
-    }
-    return result.all();
+    let result = [...this.hospitals];
+    if (city) result = result.filter(h => h.city === city);
+    if (specialization) result = result.filter(h => h.specializations.includes(specialization));
+    return result;
   }
 
   getHospital(id: number): Hospital | undefined {
-    return db.select().from(hospitals).where(eq(hospitals.id, id)).get();
+    return this.hospitals.find(h => h.id === id);
   }
 
   createHospital(h: InsertHospital): Hospital {
-    return db.insert(hospitals).values(h).returning().get();
+    const hospital: Hospital = { ...h, id: this.nextHospitalId++, imageUrl: h.imageUrl ?? null };
+    this.hospitals.push(hospital);
+    return hospital;
   }
 
   getTreatments(category?: string): Treatment[] {
-    if (category) {
-      return db.select().from(treatments).where(eq(treatments.category, category)).all();
-    }
-    return db.select().from(treatments).all();
+    if (category) return this.treatments.filter(t => t.category === category);
+    return [...this.treatments];
   }
 
   getTreatment(id: number): Treatment | undefined {
-    return db.select().from(treatments).where(eq(treatments.id, id)).get();
+    return this.treatments.find(t => t.id === id);
   }
 
   createTreatment(t: InsertTreatment): Treatment {
-    return db.insert(treatments).values(t).returning().get();
+    const treatment: Treatment = { ...t, id: this.nextTreatmentId++ };
+    this.treatments.push(treatment);
+    return treatment;
   }
 
   getInquiries(): Inquiry[] {
-    return db.select().from(inquiries).all();
+    return [...this.inquiries];
   }
 
   getInquiry(id: number): Inquiry | undefined {
-    return db.select().from(inquiries).where(eq(inquiries.id, id)).get();
+    return this.inquiries.find(i => i.id === id);
   }
 
   createInquiry(i: InsertInquiry): Inquiry {
-    return db.insert(inquiries).values({
+    const inquiry: Inquiry = {
       ...i,
+      id: this.nextInquiryId++,
       status: "New",
       createdAt: new Date().toISOString(),
-    }).returning().get();
+      message: i.message ?? null,
+      preferredCity: i.preferredCity ?? null,
+    };
+    this.inquiries.push(inquiry);
+    return inquiry;
   }
 
   updateInquiryStatus(id: number, status: string): Inquiry | undefined {
-    return db.update(inquiries).set({ status }).where(eq(inquiries.id, id)).returning().get();
+    const inquiry = this.inquiries.find(i => i.id === id);
+    if (inquiry) inquiry.status = status;
+    return inquiry;
   }
 
   createCostEstimate(c: InsertCostEstimate): CostEstimate {
-    return db.insert(costEstimates).values({
+    const estimate: CostEstimate = {
       ...c,
+      id: this.nextCostEstimateId++,
       createdAt: new Date().toISOString(),
-    }).returning().get();
+      inquiryId: c.inquiryId ?? null,
+      hospitalId: c.hospitalId ?? null,
+      notes: c.notes ?? null,
+    };
+    this.costEstimates.push(estimate);
+    return estimate;
   }
 
   getCostEstimates(treatmentId: number): CostEstimate[] {
-    return db.select().from(costEstimates).where(eq(costEstimates.treatmentId, treatmentId)).all();
+    return this.costEstimates.filter(c => c.treatmentId === treatmentId);
   }
 
   getStats() {
-    const allInquiries = db.select().from(inquiries).all();
+    const allInquiries = this.inquiries;
     const today = new Date().toISOString().split("T")[0];
     const newToday = allInquiries.filter(i => i.createdAt.startsWith(today)).length;
     const pendingFollowUps = allInquiries.filter(i => i.status === "Contacted").length;
     const converted = allInquiries.filter(i => i.status === "Converted").length;
     const conversionRate = allInquiries.length > 0 ? Math.round((converted / allInquiries.length) * 100) : 0;
 
-    // Group by treatment
     const treatmentMap: Record<string, number> = {};
     allInquiries.forEach(i => {
       treatmentMap[i.treatmentInterest] = (treatmentMap[i.treatmentInterest] || 0) + 1;
     });
     const byTreatment = Object.entries(treatmentMap).map(([treatment, count]) => ({ treatment, count }));
 
-    // Group by city
     const cityMap: Record<string, number> = {};
     allInquiries.forEach(i => {
       if (i.preferredCity) cityMap[i.preferredCity] = (cityMap[i.preferredCity] || 0) + 1;
     });
     const byCity = Object.entries(cityMap).map(([city, count]) => ({ city, count }));
 
-    // Group by country
     const countryMap: Record<string, number> = {};
     allInquiries.forEach(i => {
       countryMap[i.country] = (countryMap[i.country] || 0) + 1;
@@ -151,9 +160,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   hospitalCount(): number {
-    const result = db.select({ count: sql<number>`count(*)` }).from(hospitals).get();
-    return result?.count ?? 0;
+    return this.hospitals.length;
+  }
+
+  // Direct insert for seeding with specific status/date
+  insertInquiryDirect(data: Omit<Inquiry, "id">): Inquiry {
+    const inquiry: Inquiry = { ...data, id: this.nextInquiryId++ };
+    this.inquiries.push(inquiry);
+    return inquiry;
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new MemoryStorage();
